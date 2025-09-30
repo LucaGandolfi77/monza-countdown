@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -20,6 +20,56 @@
             min-height: 100vh;
             padding: 20px 15px;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Effetto glitter animato */
+        .glitter {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            animation: sparkleFloat 3s infinite ease-in-out;
+            opacity: 0;
+        }
+
+        @keyframes sparkleFloat {
+            0%, 100% { 
+                opacity: 0; 
+                transform: translateY(0) scale(0);
+            }
+            50% { 
+                opacity: 1; 
+                transform: translateY(-100px) scale(1.5);
+            }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        .star {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, #fff 0%, transparent 70%);
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+            pointer-events: none;
         }
 
         .header {
@@ -27,19 +77,28 @@
             color: white;
             margin-bottom: 30px;
             animation: fadeIn 1s ease-in;
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
 
         .header h1 {
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 8px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 30px rgba(255, 255, 255, 0.6);
+            animation: glow 2s infinite alternate;
         }
 
         .header p {
             font-size: 14px;
             opacity: 0.95;
             font-weight: 500;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255, 255, 255, 0.4); }
+            to { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 40px rgba(255, 255, 255, 0.8); }
         }
 
         .countdown-grid {
@@ -49,6 +108,8 @@
             max-width: 500px;
             margin: 0 auto;
             padding-bottom: 30px;
+            position: relative;
+            z-index: 10;
         }
 
         .day-box {
@@ -62,7 +123,7 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2), 0 0 20px rgba(255, 255, 255, 0.3);
             position: relative;
             overflow: hidden;
         }
@@ -79,6 +140,25 @@
             transition: opacity 0.3s ease;
         }
 
+        .day-box::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                transparent 30%, 
+                rgba(255, 255, 255, 0.3) 50%, 
+                transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
         .day-box span {
             position: relative;
             z-index: 1;
@@ -88,7 +168,7 @@
 
         .day-box.available:hover {
             transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3), 0 0 30px rgba(255, 255, 255, 0.5);
         }
 
         .day-box.available::before {
@@ -111,11 +191,23 @@
 
         .day-box.opened {
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            animation: pulse 2s infinite;
+            animation: pulseGlow 2s infinite;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2), 0 0 30px rgba(56, 239, 125, 0.6);
         }
 
         .day-box.opened span {
             color: white;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2), 0 0 20px rgba(56, 239, 125, 0.4);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2), 0 0 40px rgba(56, 239, 125, 0.8);
+            }
         }
 
         .day-box.opened::after {
@@ -132,6 +224,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 2;
+            animation: none;
         }
 
         .modal {
@@ -154,14 +248,31 @@
         }
 
         .modal-content {
-            background: white;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
             border-radius: 20px;
             padding: 30px 25px;
             max-width: 400px;
             width: 100%;
             text-align: center;
             animation: slideUp 0.4s ease;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3), 0 0 60px rgba(102, 126, 234, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                transparent 30%, 
+                rgba(255, 255, 255, 0.5) 50%, 
+                transparent 70%);
+            animation: shimmer 2s infinite;
+            pointer-events: none;
         }
 
         .modal-day {
@@ -171,6 +282,9 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            animation: glow 2s infinite alternate;
         }
 
         .modal-quote {
@@ -180,6 +294,8 @@
             font-style: italic;
             margin-bottom: 25px;
             padding: 0 10px;
+            position: relative;
+            z-index: 1;
         }
 
         .modal-close {
@@ -192,7 +308,9 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4), 0 0 20px rgba(102, 126, 234, 0.3);
+            position: relative;
+            z-index: 1;
         }
 
         .modal-close:active {
@@ -215,11 +333,6 @@
             }
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
         @media (max-width: 375px) {
             .countdown-grid {
                 grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
@@ -237,9 +350,11 @@
     </style>
 </head>
 <body>
+    <div class="glitter" id="glitter"></div>
+
     <div class="header">
         <h1>🛼 Monza Precision Team 🛼</h1>
-        <p>Countdown to World Championships</p>
+        <p>Countdown per i Campionati Mondiali</p>
     </div>
 
     <div class="countdown-grid" id="countdownGrid"></div>
@@ -248,55 +363,81 @@
         <div class="modal-content">
             <div class="modal-day" id="modalDay"></div>
             <div class="modal-quote" id="modalQuote"></div>
-            <button class="modal-close" onclick="closeModal()">Close</button>
+            <button class="modal-close" onclick="closeModal()">Chiudi</button>
         </div>
     </div>
 
     <script>
         const quotes = [
-            "Champions are made when no one is watching. Keep pushing!",
-            "Every glide, every turn, every practice brings you closer to greatness.",
-            "The difference between ordinary and extraordinary is practice.",
-            "Your wheels are wings. Let them carry you to victory!",
-            "Precision isn't perfection—it's dedication repeated daily.",
-            "On the track, you're not just skating—you're creating art.",
-            "The team that trains together, wins together!",
-            "Balance, grace, power—that's the precision way.",
-            "Champions don't wait for opportunities. They create them.",
-            "Every fall is a lesson. Every rise is strength.",
-            "Speed is nothing without control. Control is everything.",
-            "Your passion is your power. Never forget why you started.",
-            "Synchronicity isn't luck—it's countless hours of harmony.",
-            "The podium is built on early mornings and late nights.",
-            "Trust your training. Trust your team. Trust yourself.",
-            "Skating is not just sport—it's poetry in motion.",
-            "World Championships aren't won in a day. They're won today.",
-            "Excellence is not a skill. It's an attitude.",
-            "When the music starts, let your heart lead your wheels.",
-            "Pressure makes diamonds. You're already shining.",
-            "The harder you work in silence, the louder your success.",
-            "Champions adjust their sails when the wind changes.",
-            "Your competitors see your performance. Your team sees your heart.",
-            "Form follows function. Grace follows practice.",
-            "The scoreboard doesn't show the sacrifices. But you know them.",
-            "Unity in movement. Power in precision. Victory in teamwork.",
-            "Mental strength wins championships. Keep your mind sharp.",
-            "Every routine is a story. Make yours unforgettable.",
-            "The wheels may turn, but it's your will that drives you forward.",
-            "Today's training is tomorrow's triumph. World Championships, here we come!"
+            "I campioni si fanno quando nessuno guarda. Continua a spingere!",
+            "Ogni scivolata, ogni curva, ogni allenamento ti avvicina alla grandezza.",
+            "La differenza tra ordinario e straordinario è la pratica.",
+            "Le tue ruote sono ali. Lascia che ti portino alla vittoria!",
+            "La precisione non è perfezione—è dedizione ripetuta ogni giorno.",
+            "Sulla pista non stai solo pattinando—stai creando arte.",
+            "La squadra che si allena insieme, vince insieme!",
+            "Equilibrio, grazia, potenza—questo è il modo della precisione.",
+            "I campioni non aspettano le opportunità. Le creano.",
+            "Ogni caduta è una lezione. Ogni rialzata è forza.",
+            "La velocità non è nulla senza controllo. Il controllo è tutto.",
+            "La tua passione è il tuo potere. Non dimenticare mai perché hai iniziato.",
+            "La sincronizzazione non è fortuna—sono ore infinite di armonia.",
+            "Il podio si costruisce con albe precoci e notti tardive.",
+            "Fidati del tuo allenamento. Fidati della tua squadra. Fidati di te stesso.",
+            "Il pattinaggio non è solo sport—è poesia in movimento.",
+            "I Mondiali non si vincono in un giorno. Si vincono oggi.",
+            "L'eccellenza non è un'abilità. È un atteggiamento.",
+            "Quando parte la musica, lascia che il tuo cuore guidi le tue ruote.",
+            "La pressione crea diamanti. Tu stai già brillando.",
+            "Più lavori in silenzio, più rumoroso sarà il tuo successo.",
+            "I campioni aggiustano le vele quando cambia il vento.",
+            "I tuoi avversari vedono la tua performance. La tua squadra vede il tuo cuore.",
+            "La forma segue la funzione. La grazia segue la pratica.",
+            "Il punteggio non mostra i sacrifici. Ma tu li conosci.",
+            "Unità nel movimento. Potenza nella precisione. Vittoria nel lavoro di squadra.",
+            "La forza mentale vince i campionati. Mantieni la mente affilata.",
+            "Ogni routine è una storia. Rendi la tua indimenticabile.",
+            "Le ruote possono girare, ma è la tua volontà che ti spinge avanti.",
+            "L'allenamento di oggi è il trionfo di domani. Mondiali, stiamo arrivando!"
         ];
 
         const OCTOBER_2025 = {
             year: 2025,
-            month: 9 // October (0-indexed)
+            month: 9
         };
+
+        // Crea effetto glitter
+        function createGlitter() {
+            const glitterContainer = document.getElementById('glitter');
+            
+            // Crea particelle sparkle
+            for (let i = 0; i < 50; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.style.animationDelay = Math.random() * 3 + 's';
+                sparkle.style.animationDuration = (2 + Math.random() * 2) + 's';
+                glitterContainer.appendChild(sparkle);
+            }
+
+            // Crea stelle twinkle
+            for (let i = 0; i < 30; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                star.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+                glitterContainer.appendChild(star);
+            }
+        }
 
         function initCalendar() {
             const grid = document.getElementById('countdownGrid');
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            // Get opened boxes from memory
             const openedBoxes = getOpenedBoxes();
 
             for (let day = 1; day <= 30; day++) {
@@ -310,7 +451,6 @@
                 span.textContent = day;
                 box.appendChild(span);
 
-                // Check if this box was previously opened
                 if (openedBoxes.includes(day)) {
                     box.classList.add('opened');
                 } else if (boxDate <= today) {
@@ -329,15 +469,13 @@
             const modalDay = document.getElementById('modalDay');
             const modalQuote = document.getElementById('modalQuote');
 
-            modalDay.textContent = `Day ${day}`;
+            modalDay.textContent = `Giorno ${day}`;
             modalQuote.textContent = `"${quotes[day - 1]}"`;
 
             modal.classList.add('active');
 
-            // Mark box as opened
             markBoxAsOpened(day);
             
-            // Update the visual state of the box
             const boxes = document.querySelectorAll('.day-box');
             boxes[day - 1].classList.remove('available');
             boxes[day - 1].classList.add('opened');
@@ -364,15 +502,16 @@
             sessionStorage.setItem(`box_${day}`, 'true');
         }
 
-        // Close modal when clicking outside
         document.getElementById('modal').addEventListener('click', (e) => {
             if (e.target.id === 'modal') {
                 closeModal();
             }
         });
 
-        // Initialize on load
-        window.onload = initCalendar;
+        window.onload = () => {
+            createGlitter();
+            initCalendar();
+        };
     </script>
 </body>
 </html>
