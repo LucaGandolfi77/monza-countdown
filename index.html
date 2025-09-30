@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Monza Precision Team - Countdown</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 15px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .countdown-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            gap: 12px;
+            max-width: 500px;
+            margin: 0 auto;
+            padding-bottom: 30px;
+        }
+
+        .day-box {
+            aspect-ratio: 1;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .day-box span {
+            position: relative;
+            z-index: 1;
+            color: #667eea;
+            transition: color 0.3s ease;
+        }
+
+        .day-box.available:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .day-box.available::before {
+            opacity: 0.15;
+        }
+
+        .day-box.available:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .day-box.locked {
+            background: linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 100%);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .day-box.locked span {
+            color: #666;
+        }
+
+        .day-box.opened {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            animation: pulse 2s infinite;
+        }
+
+        .day-box.opened span {
+            color: white;
+        }
+
+        .day-box.opened::after {
+            content: '✓';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 12px;
+            color: white;
+            background: rgba(0,0,0,0.2);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px 25px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: slideUp 0.4s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-day {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .modal-quote {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            font-style: italic;
+            margin-bottom: 25px;
+            padding: 0 10px;
+        }
+
+        .modal-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .modal-close:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @media (max-width: 375px) {
+            .countdown-grid {
+                grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+                gap: 10px;
+            }
+            
+            .day-box {
+                font-size: 18px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛼 Monza Precision Team 🛼</h1>
+        <p>Countdown to World Championships</p>
+    </div>
+
+    <div class="countdown-grid" id="countdownGrid"></div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-day" id="modalDay"></div>
+            <div class="modal-quote" id="modalQuote"></div>
+            <button class="modal-close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const quotes = [
+            "Champions are made when no one is watching. Keep pushing!",
+            "Every glide, every turn, every practice brings you closer to greatness.",
+            "The difference between ordinary and extraordinary is practice.",
+            "Your wheels are wings. Let them carry you to victory!",
+            "Precision isn't perfection—it's dedication repeated daily.",
+            "On the track, you're not just skating—you're creating art.",
+            "The team that trains together, wins together!",
+            "Balance, grace, power—that's the precision way.",
+            "Champions don't wait for opportunities. They create them.",
+            "Every fall is a lesson. Every rise is strength.",
+            "Speed is nothing without control. Control is everything.",
+            "Your passion is your power. Never forget why you started.",
+            "Synchronicity isn't luck—it's countless hours of harmony.",
+            "The podium is built on early mornings and late nights.",
+            "Trust your training. Trust your team. Trust yourself.",
+            "Skating is not just sport—it's poetry in motion.",
+            "World Championships aren't won in a day. They're won today.",
+            "Excellence is not a skill. It's an attitude.",
+            "When the music starts, let your heart lead your wheels.",
+            "Pressure makes diamonds. You're already shining.",
+            "The harder you work in silence, the louder your success.",
+            "Champions adjust their sails when the wind changes.",
+            "Your competitors see your performance. Your team sees your heart.",
+            "Form follows function. Grace follows practice.",
+            "The scoreboard doesn't show the sacrifices. But you know them.",
+            "Unity in movement. Power in precision. Victory in teamwork.",
+            "Mental strength wins championships. Keep your mind sharp.",
+            "Every routine is a story. Make yours unforgettable.",
+            "The wheels may turn, but it's your will that drives you forward.",
+            "Today's training is tomorrow's triumph. World Championships, here we come!"
+        ];
+
+        const OCTOBER_2025 = {
+            year: 2025,
+            month: 9 // October (0-indexed)
+        };
+
+        function initCalendar() {
+            const grid = document.getElementById('countdownGrid');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Get opened boxes from memory
+            const openedBoxes = getOpenedBoxes();
+
+            for (let day = 1; day <= 30; day++) {
+                const boxDate = new Date(OCTOBER_2025.year, OCTOBER_2025.month, day);
+                boxDate.setHours(0, 0, 0, 0);
+                
+                const box = document.createElement('div');
+                box.className = 'day-box';
+                
+                const span = document.createElement('span');
+                span.textContent = day;
+                box.appendChild(span);
+
+                // Check if this box was previously opened
+                if (openedBoxes.includes(day)) {
+                    box.classList.add('opened');
+                } else if (boxDate <= today) {
+                    box.classList.add('available');
+                    box.onclick = () => openBox(day);
+                } else {
+                    box.classList.add('locked');
+                }
+
+                grid.appendChild(box);
+            }
+        }
+
+        function openBox(day) {
+            const modal = document.getElementById('modal');
+            const modalDay = document.getElementById('modalDay');
+            const modalQuote = document.getElementById('modalQuote');
+
+            modalDay.textContent = `Day ${day}`;
+            modalQuote.textContent = `"${quotes[day - 1]}"`;
+
+            modal.classList.add('active');
+
+            // Mark box as opened
+            markBoxAsOpened(day);
+            
+            // Update the visual state of the box
+            const boxes = document.querySelectorAll('.day-box');
+            boxes[day - 1].classList.remove('available');
+            boxes[day - 1].classList.add('opened');
+            boxes[day - 1].onclick = null;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.remove('active');
+        }
+
+        function getOpenedBoxes() {
+            const opened = {};
+            for (let i = 1; i <= 30; i++) {
+                const key = `box_${i}`;
+                if (sessionStorage.getItem(key)) {
+                    opened[i] = true;
+                }
+            }
+            return Object.keys(opened).map(Number);
+        }
+
+        function markBoxAsOpened(day) {
+            sessionStorage.setItem(`box_${day}`, 'true');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') {
+                closeModal();
+            }
+        });
+
+        // Initialize on load
+        window.onload = initCalendar;
+    </script>
+</body>
+</html>
